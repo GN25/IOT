@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="30dp"
+        android:columnCount="3"
+        android:rowCount="4"
+        android:useDefaultMargins="true">
+
+    <Button
+        android:id="@+id/btnLights"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_gravity="center"
+        android:text="Lights"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnAlarm"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_row="0"
+        android:layout_column="1"
+        android:layout_gravity="center"
+        android:text="Alarm"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnHeating"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:layout_gravity="center"
+        android:text="Heating"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnThermometer"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_row="1"
+        android:layout_column="1"
+        android:layout_gravity="center"
+        android:text="Thermometer"
+        android:textSize="18sp" />
+    </GridLayout>
+
+</RelativeLayout>
