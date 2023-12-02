@@ -1,57 +1,90 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#9912988C">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#008577"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:title="IOT"
+        android:titleTextColor="#FFFFFF">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <!-- The main title -->
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="248dp"
+                android:text="IOT"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
 
     <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="30dp"
-        android:columnCount="3"
-        android:rowCount="4"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:columnCount="2"
+        android:rowCount="2"
         android:useDefaultMargins="true">
 
-    <Button
-        android:id="@+id/btnLights"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_row="0"
-        android:layout_column="0"
-        android:layout_gravity="center"
-        android:text="Lights"
-        android:textSize="18sp" />
+        <ImageButton
+            android:id="@+id/btnLights"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/lights" />
 
-    <Button
-        android:id="@+id/btnAlarm"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_row="0"
-        android:layout_column="1"
-        android:layout_gravity="center"
-        android:text="Alarm"
-        android:textSize="18sp" />
+        <ImageButton
+            android:id="@+id/btnAlarm"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/alarm" />
 
-    <Button
-        android:id="@+id/btnHeating"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_row="1"
-        android:layout_column="0"
-        android:layout_gravity="center"
-        android:text="Heating"
-        android:textSize="18sp" />
+        <ImageButton
+            android:id="@+id/btnHeating"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/heating" />
 
-    <Button
-        android:id="@+id/btnThermometer"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_row="1"
-        android:layout_column="1"
-        android:layout_gravity="center"
-        android:text="Thermometer"
-        android:textSize="18sp" />
+        <ImageButton
+            android:id="@+id/btnThermometer"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/thermometer" />
     </GridLayout>
-
 </RelativeLayout>
