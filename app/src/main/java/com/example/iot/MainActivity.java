@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,10 +15,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnLights = findViewById(R.id.btnLights);
-        Button btnAlarm = findViewById(R.id.btnAlarm);
-        Button btnHeating = findViewById(R.id.btnHeating);
-        Button btnThermometer = findViewById(R.id.btnThermometer);
+        ImageButton btnLights = findViewById(R.id.btnLights);
+        ImageButton btnAlarm = findViewById(R.id.btnAlarm);
+        ImageButton btnHeating = findViewById(R.id.btnHeating);
+        ImageButton btnThermometer = findViewById(R.id.btnThermometer);
 
         btnLights.setOnClickListener(new View.OnClickListener() {
             @Override
