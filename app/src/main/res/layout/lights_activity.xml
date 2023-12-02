@@ -13,5 +13,12 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#008577"/>
 
-
+    <TextView
+        android:id="@+id/luxLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Detected lux level = 0"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_centerInParent="true"/>
 </RelativeLayout>
