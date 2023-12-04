@@ -17,8 +17,88 @@
         android:id="@+id/luxLevelTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="636dp"
         android:text="Detected lux level = 0"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:layout_centerInParent="true"/>
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textStartHour"
+        android:layout_width="275dp"
+        android:layout_height="39dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="122dp"
+        android:layout_marginBottom="489dp"
+        android:text="Select start hour:"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <TimePicker
+        android:id="@+id/timePickerStart"
+        android:layout_width="270dp"
+        android:layout_height="133dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="135dp"
+        android:layout_marginBottom="352dp"
+        android:timePickerMode="spinner" />
+
+    <TextView
+        android:id="@+id/textEndHour"
+        android:layout_width="286dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="111dp"
+        android:layout_marginBottom="310dp"
+        android:text="Select End Hour: "
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <TimePicker
+        android:id="@+id/timePickerEnd"
+        android:layout_width="298dp"
+        android:layout_height="126dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="161dp"
+        android:timePickerMode="spinner" />
+
+    <Button
+        android:id="@+id/btnSubmitLights"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="91dp"
+        android:text="Submit" />
+
+    <TextView
+        android:id="@+id/textViewLightsTimeRange"
+        android:layout_width="306dp"
+        android:layout_height="38dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="94dp"
+        android:layout_marginBottom="584dp"
+        android:text=""
+        android:textSize="18sp" />
+
+    <Switch
+        android:id="@+id/switchLights"
+        android:layout_width="323dp"
+        android:layout_height="44dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="83dp"
+        android:layout_marginBottom="535dp"
+        android:checked="false"
+        android:text="Automated Lights"
+        android:textSize="24sp"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
 </RelativeLayout>
