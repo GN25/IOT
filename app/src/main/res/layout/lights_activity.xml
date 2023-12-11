@@ -11,15 +11,17 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#008577"/>
+        android:background="#008577" />
 
     <TextView
         android:id="@+id/luxLevelTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="636dp"
-        android:text="Detected lux level = 0"
+        android:layout_above="@+id/textViewLightsTimeRange"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="71dp"
+        android:layout_marginBottom="14dp"
+        android:text="Detected lux level = "
         android:textColor="#FFFFFF"
         android:textSize="18sp" />
 

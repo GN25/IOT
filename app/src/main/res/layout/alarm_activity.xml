@@ -13,22 +13,43 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#008577"/>
 
+    <!--
+android:layout_marginStart="39dp"
+        android:layout_marginTop="119dp"
+        android:layout_marginEnd="243dp"
+        android:layout_marginBottom="553dp"
+        -->
+
     <Switch
         android:id="@+id/switchAlarm"
-        android:layout_width="129dp"
-        android:layout_height="59dp"
+        android:layout_width="261dp"
+        android:layout_height="98dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="119dp"
-        android:layout_marginEnd="243dp"
-        android:layout_marginBottom="553dp"
+
+
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="87dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginBottom="546dp"
         android:checked="false"
         android:text="Alarm"
         android:textSize="24sp"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <TextView
+        android:id="@+id/tx_prox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="226dp"
+        android:layout_marginEnd="328dp"
+        android:layout_marginBottom="486dp"
+        android:text="Proximity: " />
 
 
 </RelativeLayout>
