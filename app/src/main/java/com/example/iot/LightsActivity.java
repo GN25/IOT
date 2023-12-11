@@ -111,7 +111,7 @@ public class LightsActivity extends AppCompatActivity {
 
 
                 if(value<3){
-                    //Prueba para valores
+                    //Prueba para valores,
                 }else{
 
                 }
