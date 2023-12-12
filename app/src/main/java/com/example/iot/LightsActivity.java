@@ -6,7 +6,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +28,15 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
+
 public class LightsActivity extends AppCompatActivity {
 
     private static final String PREF_NAME = "LightsPrefs";
@@ -40,6 +51,8 @@ public class LightsActivity extends AppCompatActivity {
     private TextView textViewLightsTimeRange;
 
     private TextView tx_light;
+
+    //private TextView lux_prueba;
     private Switch switchLights;
 
     private SharedPreferences sharedPreferences;
@@ -49,6 +62,8 @@ public class LightsActivity extends AppCompatActivity {
     private MqttAndroidClient client;
     private static final String SERVER_URI = "tcp://test.mosquitto.org:1883";
     private static final String TAG = "LightsActivity";
+
+    String outputvalue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +77,7 @@ public class LightsActivity extends AppCompatActivity {
         textViewLightsTimeRange = findViewById(R.id.textViewLightsTimeRange);
         Button btnSubmitLights = findViewById(R.id.btnSubmitLights);
         switchLights = findViewById(R.id.switchLights);
-
+        //lux_prueba=findViewById(R.id.luxPrueba);
         tx_light=findViewById(R.id.luxLevelTextView);
 
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -112,8 +127,9 @@ public class LightsActivity extends AppCompatActivity {
 
                 if(value<3){
                     //Prueba para valores,
+                    //activateLamp();
                 }else{
-
+                    //desactivateLamp();
                 }
 
             }
@@ -165,6 +181,29 @@ public class LightsActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void activateLamp() {
+        run("python3 turnOn.py");
+    }
+    private void desactivateLamp() {
+        run("python3 turnOff.py");
+    }
+
+    private void readTemperature() {
+        new AsyncTask<Integer, Void, Void>(){
+            @Override
+            protected Void doInBackground(Integer... params) {
+                // Add code to fetch data via SSH
+                run("python3 listsensors.py");
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void v) {
+                // Add code to preform actions after doInBackground
+                //lux_prueba.setText(outputvalue);
+            }
+        }.execute(1);
     }
 
     private void saveSelectedTimeRange(int startHour, int startMinute, int endHour, int endMinute) {
@@ -259,4 +298,48 @@ public class LightsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+
+
+    ///////////////////////SSH LIBRARY
+
+    public void run (String command) {
+        String hostname = "192.168.1.8";
+        String username = "pi";
+        String password = "iot";
+        StringBuilder str = new StringBuilder();
+        try         {
+            StrictMode.ThreadPolicy policy = new
+                    StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            Connection conn = new Connection(hostname); //init connection
+            conn.connect();
+            //start connection to the hostname
+            boolean isAuthenticated = conn.authenticateWithPassword(username, password);
+            if (isAuthenticated == false)
+                throw new IOException("Authentication failed.");
+            Session sess = conn.openSession();
+            sess.execCommand(command);
+            InputStream stdout = new StreamGobbler(sess.getStdout());
+            BufferedReader br = new BufferedReader(new InputStreamReader(stdout)); //reads text
+            while (true){
+                String line = br.readLine(); // read line
+                if (line == null)
+                    break;
+                str.append(line);
+                System.out.println(line);
+            }
+            outputvalue = str.toString();
+            /* Show exit status, if available (otherwise "null") */
+            System.out.println("ExitCode: " + sess.getExitStatus());
+            sess.close(); // Close this session
+             conn.close();
+
+        } catch (IOException e)         {
+            e.printStackTrace(System.err);
+            System.exit(2);
+        }
+    }
+
 }
