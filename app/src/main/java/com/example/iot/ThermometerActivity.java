@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -14,6 +15,15 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
 
 public class ThermometerActivity extends AppCompatActivity {
 
@@ -24,9 +34,9 @@ public class ThermometerActivity extends AppCompatActivity {
     private TextView textViewTemperatureTDisplay;
     private Switch switchTherm;
     private SharedPreferences sharedPreferences;
-
+     private TextView tvTermometro;
     boolean active = false;
-
+    String outputvalue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +52,10 @@ public class ThermometerActivity extends AppCompatActivity {
 
         editTextMaxTemperatureT = findViewById(R.id.editTextMaxTemperatureT);
         textViewTemperatureTDisplay = findViewById(R.id.textViewTemperatureTDisplay);
+        tvTermometro = findViewById(R.id.tvTemp);
+
+        getValorSensor();
+
         Button btnSubmit = findViewById(R.id.btnSubmit);
 
         switchTherm = findViewById(R.id.switchThermometer);
@@ -90,6 +104,17 @@ public class ThermometerActivity extends AppCompatActivity {
         });
     }
 
+    private void getValorSensor() {
+        run("tdtool --list-sensors");
+        /*
+        String[] lines = outputvalue.split("\n");
+        String[] vals = lines[0].split(" ");
+
+
+         */
+        tvTermometro.setText(outputvalue);
+    }
+
     private void handleSwitchOn() {
         active = true;
         Toast.makeText(this, "Thermometer notifications are ON", Toast.LENGTH_SHORT).show();
@@ -124,5 +149,46 @@ public class ThermometerActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(KEY_SWITCH_STATE, isChecked);
         editor.apply();
+    }
+
+
+
+    public void run (String command) {
+        String hostname = "192.168.1.8";
+        String username = "pi";
+        String password = "iot";
+        StringBuilder str = new StringBuilder();
+        try         {
+            StrictMode.ThreadPolicy policy = new
+                    StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            Connection conn = new Connection(hostname); //init connection
+            conn.connect();
+            //start connection to the hostname
+            boolean isAuthenticated = conn.authenticateWithPassword(username, password);
+            if (isAuthenticated == false)
+                throw new IOException("Authentication failed.");
+            Session sess = conn.openSession();
+            sess.execCommand(command);
+            InputStream stdout = new StreamGobbler(sess.getStdout());
+            BufferedReader br = new BufferedReader(new InputStreamReader(stdout)); //reads text
+            while (true){
+                String line = br.readLine(); // read line
+                if (line == null)
+                    break;
+                str.append(line);
+                System.out.println(line);
+            }
+            outputvalue = str.toString();
+            /* Show exit status, if available (otherwise "null") */
+            System.out.println("ExitCode: " + sess.getExitStatus());
+            sess.close(); // Close this session
+            conn.close();
+
+        } catch (IOException e)         {
+            e.printStackTrace(System.err);
+            System.exit(2);
+        }
     }
 }

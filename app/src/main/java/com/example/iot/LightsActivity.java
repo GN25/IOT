@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -55,6 +56,8 @@ public class LightsActivity extends AppCompatActivity {
     //private TextView lux_prueba;
     private Switch switchLights;
 
+    private Switch switchOnOffLights;
+
     private SharedPreferences sharedPreferences;
 
     boolean active = false;
@@ -64,6 +67,7 @@ public class LightsActivity extends AppCompatActivity {
     private static final String TAG = "LightsActivity";
 
     String outputvalue;
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,8 @@ public class LightsActivity extends AppCompatActivity {
         textViewLightsTimeRange = findViewById(R.id.textViewLightsTimeRange);
         Button btnSubmitLights = findViewById(R.id.btnSubmitLights);
         switchLights = findViewById(R.id.switchLights);
+
+        switchOnOffLights = findViewById(R.id.switchLightsOnOff);
         //lux_prueba=findViewById(R.id.luxPrueba);
         tx_light=findViewById(R.id.luxLevelTextView);
 
@@ -159,6 +165,23 @@ public class LightsActivity extends AppCompatActivity {
                     displaySelectedTimeRange(startHour, startMinute, endHour, endMinute);
                 }else{
                     handleHourError();
+                }
+            }
+        });
+
+        switchOnOffLights.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                   // active = true;
+                    //saveSwitchState(isChecked);
+                    //processLogic();
+                    run("tdtool --on 1");
+                } else {
+                    //active = false;
+                    //saveSwitchState(isChecked);
+                    //processLogic();
+                    run("tdtool --off 1");
                 }
             }
         });
