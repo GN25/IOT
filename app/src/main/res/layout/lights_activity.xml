@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".LightsActivity"
     android:background="#9912988C">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -13,110 +15,60 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#008577" />
 
-    <TextView
-        android:id="@+id/luxLevelTextView"
+
+    <LinearLayout
+        android:id="@+id/layoutSwitch"
+        android:layout_width="510dp"
+        android:layout_height="209dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+
+        <Switch
+            android:id="@+id/switchLightsOnOff"
+            android:layout_width="323dp"
+            android:layout_height="44dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="103dp"
+            android:layout_marginEnd="80dp"
+            android:layout_marginBottom="582dp"
+            android:checked="false"
+            android:text="Lights On/Off"
+            android:textSize="24sp"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/dropdownContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toggleButtonAutomation"
+        android:layout_marginTop="4dp"/>
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleButtonAutomation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textViewLightsTimeRange"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="71dp"
-        android:layout_marginBottom="14dp"
-        android:text="Detected lux level = "
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+        android:layout_below="@+id/layoutSwitch"
+        android:layout_marginLeft="10dp"
+        app:singleSelection="true">
 
-    <TextView
-        android:id="@+id/textStartHour"
-        android:layout_width="275dp"
-        android:layout_height="39dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="122dp"
-        android:layout_marginBottom="489dp"
-        android:text="Select start hour:"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+        <Button
+            android:id="@+id/btLuxLevel"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Auto by Lux Level" />
 
-    <TimePicker
-        android:id="@+id/timePickerStart"
-        android:layout_width="270dp"
-        android:layout_height="133dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="135dp"
-        android:layout_marginBottom="352dp"
-        android:timePickerMode="spinner" />
+        <Button
+            android:id="@+id/btTimeRange"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Auto by Time Range" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <TextView
-        android:id="@+id/textEndHour"
-        android:layout_width="286dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="111dp"
-        android:layout_marginBottom="310dp"
-        android:text="Select End Hour: "
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
-
-    <TimePicker
-        android:id="@+id/timePickerEnd"
-        android:layout_width="298dp"
-        android:layout_height="126dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="161dp"
-        android:timePickerMode="spinner" />
-
-    <Button
-        android:id="@+id/btnSubmitLights"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="91dp"
-        android:text="Submit" />
-
-    <TextView
-        android:id="@+id/textViewLightsTimeRange"
-        android:layout_width="306dp"
-        android:layout_height="38dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="94dp"
-        android:layout_marginBottom="584dp"
-        android:text=""
-        android:textSize="18sp" />
-
-    <Switch
-        android:id="@+id/switchLights"
-        android:layout_width="323dp"
-        android:layout_height="44dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="83dp"
-        android:layout_marginBottom="535dp"
-        android:checked="false"
-        android:text="Automated Lights"
-        android:textSize="24sp"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-    <Switch
-        android:id="@+id/switchLightsOnOff"
-        android:layout_width="323dp"
-        android:layout_height="44dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="103dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="582dp"
-        android:checked="false"
-        android:text="Turn On/off Lights"
-        android:textSize="24sp"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
 </RelativeLayout>

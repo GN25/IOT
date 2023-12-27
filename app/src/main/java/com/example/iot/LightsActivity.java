@@ -7,18 +7,24 @@ import androidx.appcompat.widget.Toolbar;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -33,10 +39,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Calendar;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
+
+
 
 public class LightsActivity extends AppCompatActivity {
 
@@ -47,26 +56,45 @@ public class LightsActivity extends AppCompatActivity {
     private static final String KEY_END_MINUTE = "endMinute";
     private static final String KEY_SWITCH_STATE = "switchState";
 
-    private TimePicker timePickerStart;
-    private TimePicker timePickerEnd;
-    private TextView textViewLightsTimeRange;
 
-    private TextView tx_light;
 
-    //private TextView lux_prueba;
-    private Switch switchLights;
+
 
     private Switch switchOnOffLights;
 
     private SharedPreferences sharedPreferences;
-
-    boolean active = false;
-
+    boolean automaticActive = false;
     private MqttAndroidClient client;
     private static final String SERVER_URI = "tcp://test.mosquitto.org:1883";
     private static final String TAG = "LightsActivity";
+    private Handler handler;
+    private final int INTERVAL = 5000;
+    private FrameLayout dropdownContainer;
 
     String outputvalue;
+
+
+
+    int automatedLightsMode=0;//0 nada, 1 lux level , 2 time range
+
+    //Mode1
+    private Button btnSubmitLuxLevel;
+    private TextView tvActualThresholdLuxLevel;
+    private TextView tvReceivedLuxValue;
+    private EditText editTextNewLuxValue;
+    private  int lux_threshold = 3;
+    private float lux_value_received;
+
+    //Mode2
+    private Button btnSubmitTimeRange;
+    private TimePicker timePickerStart ;
+    private TimePicker timePickerEnd ;
+    private TextView tvRange;
+    private int hourS;
+    private int minS;
+    private int hourE;
+    private int minE;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,30 +104,69 @@ public class LightsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        timePickerStart = findViewById(R.id.timePickerStart);
-        timePickerEnd = findViewById(R.id.timePickerEnd);
-        textViewLightsTimeRange = findViewById(R.id.textViewLightsTimeRange);
-        Button btnSubmitLights = findViewById(R.id.btnSubmitLights);
-        switchLights = findViewById(R.id.switchLights);
+
+        //switchLights = findViewById(R.id.switchLights);
 
         switchOnOffLights = findViewById(R.id.switchLightsOnOff);
         //lux_prueba=findViewById(R.id.luxPrueba);
-        tx_light=findViewById(R.id.luxLevelTextView);
+        //tx_light=findViewById(R.id.luxLevelTextView);
 
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+
 
         int lastStartHour = sharedPreferences.getInt(KEY_START_HOUR, -1);
         int lastStartMinute = sharedPreferences.getInt(KEY_START_MINUTE, -1);
         int lastEndHour = sharedPreferences.getInt(KEY_END_HOUR, -1);
         int lastEndMinute = sharedPreferences.getInt(KEY_END_MINUTE, -1);
         boolean lastSwitchState = sharedPreferences.getBoolean(KEY_SWITCH_STATE, false);
-        switchLights.setChecked(lastSwitchState);
+       // switchLights.setChecked(lastSwitchState);
         displaySelectedTimeRange(lastStartHour, lastStartMinute, lastEndHour, lastEndMinute);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        dropdownContainer = findViewById(R.id.dropdownContainer);
+
+
+        MaterialButtonToggleGroup toggleButtonAutomation = findViewById(R.id.toggleButtonAutomation);
+        FrameLayout dropdownContainer = findViewById(R.id.dropdownContainer);
+
+        toggleButtonAutomation.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if (isChecked) {
+                    // Mostrar el dropdownContainer cuando se selecciona un botón
+                    LayoutInflater inflater = LayoutInflater.from(LightsActivity.this);
+                    View inflatedView = null;
+
+
+                    if (checkedId == R.id.btLuxLevel) {
+
+                        dropdownContainer.removeAllViews();
+                        inflatedView = inflater.inflate(R.layout.luxvalue_dropdown, dropdownContainer, false);
+                        automatedLightsMode=1;
+                        startRepeatingTask();
+                    } else if (checkedId == R.id.btTimeRange) {
+
+
+                        dropdownContainer.removeAllViews();
+                        inflatedView = inflater.inflate(R.layout.timerange_dropdown, dropdownContainer, false);
+                        automatedLightsMode=2;
+                        startRepeatingTask();
+                    }
+
+                    dropdownContainer.addView(inflatedView);
+                    dropdownContainer.setVisibility(View.VISIBLE);
+                } else {
+                    automatedLightsMode=0;
+                    dropdownContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
 
         connect();
         ////////////API CONNECTION///////////////////////////////////////////
@@ -127,16 +194,18 @@ public class LightsActivity extends AppCompatActivity {
 
                 String lux_value=newMessage.split(";")[0];
 
-                tx_light.setText("Detected lux level: "+lux_value);
+                //tx_light.setText("Detected lux level: "+lux_value);
                 Float value = Float.parseFloat(lux_value);
-
-
-                if(value<3){
+                Log.i("Lux control", "Test: "+value);
+                lux_value_received=value;
+                Log.i("Lux control", "Received: "+lux_value_received);
+                /*
+                if(value<1200){
                     //Prueba para valores,
-                    //activateLamp();
+                    activateLamp();
                 }else{
-                    //desactivateLamp();
-                }
+                    desactivateLamp();
+                }*/
 
             }
             @Override
@@ -149,85 +218,128 @@ public class LightsActivity extends AppCompatActivity {
 
 
 
-        btnSubmitLights.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int startHour = timePickerStart.getHour();
-                int startMinute = timePickerStart.getMinute();
-                int endHour = timePickerEnd.getHour();
-                int endMinute = timePickerEnd.getMinute();
-
-
-                if(startHour <= endHour && startMinute <= endMinute){
-                    saveSelectedTimeRange(startHour, startMinute, endHour, endMinute);
-
-                    displaySelectedTimeRange(startHour, startMinute, endHour, endMinute);
-                }else{
-                    handleHourError();
-                }
-            }
-        });
-
         switchOnOffLights.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                   // active = true;
-                    //saveSwitchState(isChecked);
-                    //processLogic();
-                    run("tdtool --on 1");
+                    activateLamp();
+
+
                 } else {
-                    //active = false;
-                    //saveSwitchState(isChecked);
-                    //processLogic();
-                    run("tdtool --off 1");
+                    desactivateLamp();
+
+
                 }
             }
         });
 
-        switchLights.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    active = true;
-                    saveSwitchState(isChecked);
-                    processLogic();
-                } else {
-                    active = false;
-                    saveSwitchState(isChecked);
-                    processLogic();
-                }
-            }
-        });
-
-
-
+        handler = new Handler(Looper.getMainLooper());
 
     }
 
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if(automatedLightsMode==1){
+                checkLuxLevel();
+            }
+            if(automatedLightsMode==2){
+                checkTimeRange();
+            }
+
+            handler.postDelayed(this, INTERVAL);
+        }
+    };
+
+    private void checkLuxLevel() {
+        btnSubmitLuxLevel=findViewById(R.id.buttonSaveLuxLevel);
+        tvActualThresholdLuxLevel =findViewById(R.id.tvActualThresholdValue);
+        tvReceivedLuxValue =findViewById(R.id.tvReceivedLuxValue);
+
+        editTextNewLuxValue=findViewById(R.id.editTextLuxThreshold);
+        if(btnSubmitLuxLevel!=null && tvActualThresholdLuxLevel !=null && editTextNewLuxValue!=null){
+
+            btnSubmitLuxLevel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String newValue= String.valueOf(editTextNewLuxValue.getText());
+                    tvActualThresholdLuxLevel.setText(newValue);
+                    lux_threshold=Integer.parseInt(newValue);
+                    Log.i("Lux control", "Saved: "+lux_threshold);
+                }
+            });
+            tvReceivedLuxValue.setText( lux_value_received+"");
+            if(lux_value_received<=lux_threshold){
+                //Prueba para valores,
+                activateLamp();
+                Log.i("Lux control", "Activated ("+lux_value_received+" < "+lux_threshold);
+            }else{
+                //THE IDEA IS TO PUT THE SENSOR IN AN OUTSIDE PLACE
+                //OTHERWISE IT WILL BE A LOOP:
+                //  no light -> on
+                //  on -> light
+                //  light ->off
+                //  off -> no light
+                desactivateLamp();
+                Log.i("Lux control", "Desactivated ( NO-> "+lux_value_received+" < "+lux_threshold);
+            }
+        }
+
+    }
+
+    void startRepeatingTask() {
+        runnable.run();
+    }
+    void stopRepeatingTask() {
+        handler.removeCallbacks(runnable);
+    }
     private void activateLamp() {
-        run("python3 turnOn.py");
+        run("tdtool --on 1");
     }
     private void desactivateLamp() {
-        run("python3 turnOff.py");
+        run("tdtool --off 1");
     }
 
-    private void readTemperature() {
-        new AsyncTask<Integer, Void, Void>(){
-            @Override
-            protected Void doInBackground(Integer... params) {
-                // Add code to fetch data via SSH
-                run("python3 listsensors.py");
-                return null;
+
+
+    private void checkTimeRange() {
+
+        timePickerStart = findViewById(R.id.timePickerStart);
+        timePickerEnd = findViewById(R.id.timePickerEnd);
+        btnSubmitTimeRange = findViewById(R.id.btnSubmitLights);
+        tvRange = findViewById(R.id.tvCurrentHourRange);
+        if (tvRange!=null && btnSubmitTimeRange !=null && timePickerStart != null && timePickerEnd != null) {
+            btnSubmitTimeRange.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                        hourS = timePickerStart.getHour();
+                        minS = timePickerStart.getMinute();
+                        hourE = timePickerEnd.getHour();
+                        minE = timePickerEnd.getMinute();
+                        Log.e("Hora guardada",hourS+":"+minS+" - "+hourE+":"+minE);
+                        tvRange.setText(hourS+":"+minS+" - "+hourE+":"+minE);
+
+                }
+            });
+            Calendar calendar = Calendar.getInstance();
+            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = calendar.get(Calendar.MINUTE);
+
+            if ((currentHour > hourS || (currentHour == hourS && currentMinute >= minS))
+                    && (currentHour < hourE || (currentHour == hourE && currentMinute <= minE))) {
+                Toast.makeText(this, "Hour in range", Toast.LENGTH_SHORT).show();
+                activateLamp();
+            } else {
+                Toast.makeText(this, "Hour not in range", Toast.LENGTH_SHORT).show();
+                desactivateLamp();
             }
-            @Override
-            protected void onPostExecute(Void v) {
-                // Add code to preform actions after doInBackground
-                //lux_prueba.setText(outputvalue);
-            }
-        }.execute(1);
+        } else {
+            Log.e("ERROR NULL P", "Fallo al cargar layout");
+        }
+
     }
+
 
     private void saveSelectedTimeRange(int startHour, int startMinute, int endHour, int endMinute) {
         // Save the selected time range in SharedPreferences
@@ -247,16 +359,12 @@ public class LightsActivity extends AppCompatActivity {
 
         String displayText = "Time Range: " + formatTime(startHour, startMinute)
                 + " - " + formatTime(endHour, endMinute);
-        textViewLightsTimeRange.setText(displayText);
+        //textViewLightsTimeRange.setText(displayText);
     }
 
     private String formatTime(int hour, int minute) {
         // HH:mm (24-h)
         return String.format("%02d:%02d", hour, minute);
-    }
-
-    private void processLogic() {
-
     }
 
     private void saveSwitchState(boolean isChecked) {
