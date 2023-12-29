@@ -41,6 +41,7 @@ public class Utils {
         this.context=context;
         connect();
 
+
         client.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -50,6 +51,7 @@ public class Utils {
                     subscribe("iot/sensors");
                 } else {
                     System.out.println("Connected to: " + serverURI);
+
                     subscribe("iot/sensors");
                 }
             }
@@ -73,7 +75,6 @@ public class Utils {
                 prox_value_received=p_value;
                 Log.i("Lux control", "Received: "+lux_value_received);
                 Log.i("Prox control", "Received: "+prox_value_received);
-
 
             }
             @Override
