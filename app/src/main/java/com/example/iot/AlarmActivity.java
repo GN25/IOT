@@ -7,17 +7,18 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -25,15 +26,6 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class AlarmActivity extends AppCompatActivity {
 
@@ -48,17 +40,20 @@ public class AlarmActivity extends AppCompatActivity {
     private Button bt_saveProx;
     private EditText editText_proxThreshold;
     private int actual_proxThreshold;
-    private MqttAndroidClient client;
-    private static final String SERVER_URI = "tcp://test.mosquitto.org:1883";
-    private static final String TAG = "AlarmActivity";
+
 
     private boolean notified = false;
+    private Utils utils;
 
+    private Handler handler;
+    private final int INTERVAL = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm_activity);
+
+        utils=Utils.getInstance(getApplicationContext());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,7 +62,6 @@ public class AlarmActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
 
         switchAlarm = findViewById(R.id.switchAlarm);
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -88,56 +82,9 @@ public class AlarmActivity extends AppCompatActivity {
         boolean lastSwitchState = sharedPreferences.getBoolean(KEY_SWITCH_STATE, false);
         switchAlarm.setChecked(lastSwitchState);
         notified = false;
-        connect();
-        ////////////API CONNECTION///////////////////////////////////////////
-        client.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                if (reconnect) {
-                    System.out.println("Reconnected to : " + serverURI);
-                    // Re-subscribe as we lost it due to new session
-                    subscribe("iot/sensors");
-                } else {
-                    System.out.println("Connected to: " + serverURI);
-                    subscribe("iot/sensors");
-                }
-            }
+        handler = new Handler(Looper.getMainLooper());
+        startRepeatingTask();
 
-            @Override
-            public void connectionLost(Throwable cause) {
-                System.out.println("The Connection was lost.");
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws
-                    Exception {
-                String newMessage = new String(message.getPayload());
-                System.out.println("Incoming message: " + newMessage);
-
-                String prox_value = newMessage.split(";")[1];
-
-                tx_prox.setText("Proximity detected: " + prox_value);
-
-                Float value = Float.parseFloat(prox_value);
-                if (switchAlarm.isChecked()) {
-                    if (value > actual_proxThreshold) {
-                        if (!notified) {
-                            System.out.println("ALARMA: " + value);
-                            handleAlarmDetected();
-                            notified = true;
-                        }
-
-                    }
-                }
-
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-            }
-        });
-
-        ////////////////////////////////////////////////////////////
         switchAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -150,6 +97,38 @@ public class AlarmActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+
+            checkProximity();
+            handler.postDelayed(this, INTERVAL);
+        }
+    };
+
+    void startRepeatingTask() {
+        runnable.run();
+    }
+    void stopRepeatingTask() {
+        handler.removeCallbacks(runnable);
+    }
+    private void checkProximity() {
+        tx_prox.setText("Proximity detected: " + utils.prox_value_received);
+
+        Float value = utils.prox_value_received;
+        if (switchAlarm.isChecked()) {
+            if (value > actual_proxThreshold) {
+                if (!notified) {
+                    System.out.println("ALARMA: " + value);
+                    handleAlarmDetected();
+                    notified = true;
+                }
+
+            }
+        }
     }
 
     private void handleSwitchOn() {
@@ -172,59 +151,7 @@ public class AlarmActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    //CONNECTION METHODS
-    private void connect() {
-        String clientId = MqttClient.generateClientId();
-        client =
-                new MqttAndroidClient(this.getApplicationContext(), SERVER_URI,
-                        clientId);
-        try {
-            IMqttToken token = client.connect();
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // We are connected
-                    Log.d(TAG, "onSuccess");
-                    System.out.println(TAG + " Success. Connected to " + SERVER_URI);
-                }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    // Something went wrong e.g. connection timeout or firewall problems
-                    Log.d(TAG, "onFailure");
-                    System.out.println(TAG + " Oh no! Failed to connect to " +
-                            SERVER_URI);
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void subscribe(String topicToSubscribe) {
-        final String topic = topicToSubscribe;
-        int qos = 1;
-        try {
-            IMqttToken subToken = client.subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    System.out.println("Subscription successful to topic: " + topic);
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception) {
-                    System.out.println("Failed to subscribe to topic: " + topic);
-                    // The subscription could not be performed, maybe the user was not
-                    // authorized to subscribe on the specified topic e.g. using wildcards
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
 
     void createNotification(String title, String message) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -240,13 +167,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return;
         }
         notificationManager.notify(1, builder.build());

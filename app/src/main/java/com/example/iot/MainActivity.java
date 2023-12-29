@@ -10,6 +10,9 @@ import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Utils utils;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnAlarm = findViewById(R.id.btnAlarm);
         ImageButton btnHeating = findViewById(R.id.btnHeating);
         ImageButton btnThermometer = findViewById(R.id.btnThermometer);
+
+        this.utils=Utils.getInstance(getApplicationContext());
 
         btnLights.setOnClickListener(new View.OnClickListener() {
             @Override
