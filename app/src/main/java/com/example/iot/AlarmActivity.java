@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,7 +18,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,11 +43,17 @@ public class AlarmActivity extends AppCompatActivity {
     private Switch switchAlarm;
     private SharedPreferences sharedPreferences;
     private TextView tx_prox;
+
+    private TextView tv_proxThreshold;
+    private Button bt_saveProx;
+    private EditText editText_proxThreshold;
+    private int actual_proxThreshold;
     private MqttAndroidClient client;
     private static final String SERVER_URI = "tcp://test.mosquitto.org:1883";
     private static final String TAG = "AlarmActivity";
 
     private boolean notified = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,19 @@ public class AlarmActivity extends AppCompatActivity {
         switchAlarm = findViewById(R.id.switchAlarm);
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         tx_prox = findViewById(R.id.tx_prox);
+        tv_proxThreshold=findViewById(R.id.tv_actualThresholdValue);
+        editText_proxThreshold=findViewById(R.id.editTextProximityThreshold);
+        bt_saveProx=findViewById(R.id.bt_saveProximityThreshold);
+        actual_proxThreshold=3000;
+        bt_saveProx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newValue=String.valueOf(editText_proxThreshold.getText());
+               actual_proxThreshold= Integer.parseInt(newValue);
+               tv_proxThreshold.setText(newValue);
+            }
+        });
+
         boolean lastSwitchState = sharedPreferences.getBoolean(KEY_SWITCH_STATE, false);
         switchAlarm.setChecked(lastSwitchState);
         notified = false;
@@ -93,11 +116,11 @@ public class AlarmActivity extends AppCompatActivity {
 
                 String prox_value = newMessage.split(";")[1];
 
-                tx_prox.setText("Proximity: : " + prox_value);
+                tx_prox.setText("Proximity detected: " + prox_value);
 
                 Float value = Float.parseFloat(prox_value);
                 if (switchAlarm.isChecked()) {
-                    if (value > 3000) {
+                    if (value > actual_proxThreshold) {
                         if (!notified) {
                             System.out.println("ALARMA: " + value);
                             handleAlarmDetected();
