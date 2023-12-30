@@ -143,19 +143,11 @@ public class HeatingActivity extends AppCompatActivity {
                 tempValue = utils.temp_value_received;
                 tvReceivedTemperature.setText(tempValue+"");
 
-                if(tempValue<=temp_threshold){
-                    rbHeatersState.setChecked(true);//Simulation of an actuator behaviour
-                }else{
-                    rbHeatersState.setChecked(false);//Simulation of an actuator behaviour
-                }
+                checkLimits();
 
             }else if(isSimulating){
-                Log.i("A11","Is simulating");
-                if(tempValue<=temp_threshold){
-                    rbHeatersState.setChecked(true);//Simulation of an actuator behaviour
-                }else{
-                    rbHeatersState.setChecked(false);//Simulation of an actuator behaviour
-                }
+                //Log.i("A11","Is simulating");
+               checkLimits();
             }else{
                 tvReceivedTemperature.setText("-");
             }
@@ -163,6 +155,14 @@ public class HeatingActivity extends AppCompatActivity {
             handler.postDelayed(this, INTERVAL);
         }
     };
+
+    private void checkLimits() {
+        if(tempValue<=temp_threshold){
+            rbHeatersState.setChecked(true);//Simulation of an actuator behaviour
+        }else{
+            rbHeatersState.setChecked(false);//Simulation of an actuator behaviour
+        }
+    }
 
     void startRepeatingTask() {
         runnable.run();

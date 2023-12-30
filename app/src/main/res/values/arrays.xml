@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="initial_slider_values">
-        <item>20.0</item>
-    </array>
+
+    <string-array name="spinner_items">
+        <item>&lt;</item>
+        <item>&gt;</item>
+    </string-array>
 </resources>

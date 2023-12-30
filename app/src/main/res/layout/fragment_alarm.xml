@@ -1,0 +1,67 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!-- TextView "Alarm" -->
+    <TextView
+        android:id="@+id/tvAlarmName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Alarm1"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <!-- Separador vertical -->
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#000000"/> <!-- Puedes ajustar el color a tu preferencia -->
+
+    <!-- TextView "Tª: " -->
+    <TextView
+        android:id="@+id/tvAlarmThresholdLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:text="Received"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvAlarmComparer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:text=" - "
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvAlarmThresholdValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:text="-"
+        android:textSize="16sp"/>
+
+    <!-- RadioButton -->
+    <TextView
+        android:id="@+id/degrees_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="ºC" />
+
+    <RadioButton
+        android:id="@+id/rbAlarm1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        />
+</LinearLayout>

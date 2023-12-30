@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#9912988C">
+
+    <!-- AlarmName -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvAlarmName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AlarmName:"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:hint="Enter alarm name"/>
+    </LinearLayout>
+
+    <!-- Temperature Threshold -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvTemperatureThreshold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temperature Threshold:"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editTextThreshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:hint="Enter temperature threshold"
+            android:inputType="numberDecimal" />
+
+    </LinearLayout>
+
+    <!-- Selector -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+    <TextView
+        android:id="@+id/tvComparerlabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Received:"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spComparer"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:entries="@array/spinner_items" />
+    </LinearLayout>
+    <!-- Add Button -->
+    <Button
+        android:id="@+id/btAddAlarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

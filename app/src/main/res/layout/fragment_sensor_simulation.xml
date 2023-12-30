@@ -99,8 +99,8 @@
             android:id="@+id/degrees_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ºC"
-            android:layout_margin="8dp"/>
+            android:layout_margin="8dp"
+            android:text="ºC" />
     </LinearLayout>
 
 

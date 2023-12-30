@@ -28,7 +28,7 @@
             android:layout_margin="8dp"/>
 
         <Button
-            android:id="@+id/btAddAlarm"
+            android:id="@+id/btNewAlarm"
             android:layout_width="134dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -43,4 +43,19 @@
         android:layout_height="wrap_content"
         app:dividerInsetStart="16dp"
         app:dividerInsetEnd="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/linearContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dividerInsetStart="16dp"
+            app:dividerInsetEnd="16dp"/>
+    </LinearLayout>
 </LinearLayout>
