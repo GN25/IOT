@@ -36,6 +36,7 @@ public class Utils {
 
     public float lux_value_received;
     public float prox_value_received;
+    public float temp_value_received;
 
     private Utils(Context context) {
         this.context=context;
@@ -73,14 +74,24 @@ public class Utils {
 
                 lux_value_received=l_value;
                 prox_value_received=p_value;
+                getTempSensor();
                 Log.i("Lux control", "Received: "+lux_value_received);
                 Log.i("Prox control", "Received: "+prox_value_received);
+                Log.i("Temp control", "Received: "+temp_value_received);
 
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
             }
         });
+    }
+    private void getTempSensor() {
+        run("tdtool --list-sensors");
+        String[] list=outputvalue.split("\t");
+        String[] temp=list[4].split("=");
+        temp_value_received=(Float.parseFloat(temp[1]));
+        Log.i("trial", temp[1]);
+
     }
 
     public static synchronized Utils getInstance(Context context) {

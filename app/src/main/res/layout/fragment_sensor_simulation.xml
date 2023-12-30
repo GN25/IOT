@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <!-- fragment_toggle_slider.xml -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleButtonTempAutomation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        app:singleSelection="true">
+
+        <Button
+            android:id="@+id/btSensor"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor" />
+
+        <Button
+            android:id="@+id/btSimulation"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulation" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- State TextViews -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvStateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="State:"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/tvStateValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensing"
+            android:layout_margin="8dp"/>
+    </LinearLayout>
+
+    <!-- Slider and Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderTemperature"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_centerInParent="true"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:valueFrom="-20.0"
+            android:valueTo="50.0"
+            android:stepSize="1"
+            android:value="15.0"/>
+
+        <Button
+            android:id="@+id/btApplySimulation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Apply" />
+    </LinearLayout>
+
+
+    <!-- Received Temperature -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvReceivedTemperatureLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Received temperature"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/tvReceivedTemperatureValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/degrees_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ºC"
+            android:layout_margin="8dp"/>
+    </LinearLayout>
+
+
+</LinearLayout>

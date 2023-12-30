@@ -4,41 +4,54 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
+import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.slider.Slider;
+
+
 
 public class HeatingActivity extends AppCompatActivity {
 
-    private static final String PREF_NAME = "TemperaturePrefs";
-    private static final String KEY_MIN_TEMPERATURE = "minTemperature";
-    private static final String KEY_MAX_TEMPERATURE = "maxTemperature";
 
-    private static final String KEY_SWITCH_STATE = "switchState";
 
-    private EditText editTextMinTemperature;
-    private EditText editTextMaxTemperature;
-    private TextView textViewTemperatureDisplay;
+    private static final String STATE_SENSING = "Sensing";
+    private static final String STATE_SIMULATING = "Simulating";
 
-    private Switch switchHeating;
+    private Handler handler;
+    private final int INTERVAL = 5000;
 
-    private SharedPreferences sharedPreferences;
+    private Slider sliderSimulation;
+    private Button btApplySimulation;
+    private TextView tvState;
+    private EditText editTextTempLimit;
+    private Button btSaveTempThreshold;
+    private TextView tvActualtempThreshold;
+    private TextView tvReceivedTemperature;
+    private RadioButton rbHeatersState;
 
-    boolean active = false;
-
+    private float temp_threshold;
+    private float tempValue;
+    private boolean isSensing;
+    private boolean isSimulating;
+    private Utils utils;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.heating_activity);
+        // setContentView(R.layout.heating_activity);
+        setContentView(R.layout.heaters_activity);
 
+        utils=Utils.getInstance(getApplicationContext());
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,85 +60,119 @@ public class HeatingActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        editTextMinTemperature = findViewById(R.id.editTextMinTemperature);
-        editTextMaxTemperature = findViewById(R.id.editTextMaxTemperature);
-        textViewTemperatureDisplay = findViewById(R.id.textViewTemperatureDisplay);
-        switchHeating = findViewById(R.id.switchHeating);
-        Button btnSubmit = findViewById(R.id.btnSubmit);
+        tvState=findViewById(R.id.tvStateValue);
+        sliderSimulation=findViewById(R.id.sliderTemperature);
+        btApplySimulation=findViewById(R.id.btApplySimulation);
+        editTextTempLimit=findViewById(R.id.editTextTemperatureLimit);
+        btSaveTempThreshold=findViewById(R.id.btSaveTempThreshold);
+        tvActualtempThreshold=findViewById(R.id.tvActualTemperatureThresholdValue);
+        tvReceivedTemperature=findViewById(R.id.tvReceivedTemperatureValue);
+        rbHeatersState=findViewById(R.id.rbHeatersState);
+        btApplySimulation.setEnabled(false);
+        sliderSimulation.setEnabled(false);
+        temp_threshold= 20;
+        tempValue=15;
+        tvState.setText("None");
+        tvReceivedTemperature.setText("-");
 
-        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
-        float lastMinTemperature = sharedPreferences.getFloat(KEY_MIN_TEMPERATURE, Float.NaN);
-        float lastMaxTemperature = sharedPreferences.getFloat(KEY_MAX_TEMPERATURE, Float.NaN);
-        displayEnteredTemperatures(lastMinTemperature, lastMaxTemperature);
 
-        boolean lastSwitchState = sharedPreferences.getBoolean(KEY_SWITCH_STATE, false);
-        switchHeating.setChecked(lastSwitchState);
+        MaterialButtonToggleGroup toggleButtonTempMode = findViewById(R.id.toggleButtonTempAutomation);
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+        toggleButtonTempMode.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if (isChecked) {
+                    if (checkedId == R.id.btSensor) {
+                        tvReceivedTemperature.setText(utils.temp_value_received+"");
+                        tvState.setText(STATE_SENSING);
+                        btApplySimulation.setEnabled(false);
+                        sliderSimulation.setEnabled(false);
+                        isSensing=true;
+                        isSimulating=false;
+                        startRepeatingTask();
+
+                    } else if (checkedId == R.id.btSimulation) {
+                        tvReceivedTemperature.setText("-");
+                        tvState.setText(STATE_SIMULATING);
+                        btApplySimulation.setEnabled(true);
+                        sliderSimulation.setEnabled(true);
+                        isSensing=false;
+                        isSimulating=true;
+                        startRepeatingTask();
+                    }
+
+
+                } else {
+                    tvState.setText("None");
+                    btApplySimulation.setEnabled(false);
+                    sliderSimulation.setEnabled(false);
+                    isSensing=false;
+                    isSimulating=false;
+                    tvReceivedTemperature.setText("-");
+                    stopRepeatingTask();
+                }
+            }
+        });
+        btApplySimulation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                String minTemperatureString = editTextMinTemperature.getText().toString();
-                String maxTemperatureString = editTextMaxTemperature.getText().toString();
-
-                if (!minTemperatureString.isEmpty() && !maxTemperatureString.isEmpty()) {
-
-                    float minTemperature = Float.parseFloat(minTemperatureString);
-                    float maxTemperature = Float.parseFloat(maxTemperatureString);
-                    saveEnteredTemperatures(minTemperature, maxTemperature);
-                    displayEnteredTemperatures(minTemperature, maxTemperature);
-                    processLogic();
-
-                } else {
-                    handleVoidError();
-                }
+                tempValue= sliderSimulation.getValue();
+                tvReceivedTemperature.setText(tempValue+"");
             }
         });
-
-
-        switchHeating.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        btSaveTempThreshold.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    active = true;
-                    saveSwitchState(isChecked);
-                    processLogic();
-                } else {
-                    active = false;
-                    saveSwitchState(isChecked);
-                    processLogic();
-                }
+            public void onClick(View v) {
+                String newValue= String.valueOf(editTextTempLimit.getText());
+                tvActualtempThreshold.setText(newValue);
+                temp_threshold=Float.parseFloat(newValue);
+                Log.i("Temp control", "SavedLimit: "+temp_threshold);
             }
         });
 
+        handler = new Handler(Looper.getMainLooper());
+
+
+    }
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+
+            if(isSensing){
+                tempValue = utils.temp_value_received;
+                tvReceivedTemperature.setText(tempValue+"");
+
+                if(tempValue<=temp_threshold){
+                    rbHeatersState.setChecked(true);//Simulation of an actuator behaviour
+                }else{
+                    rbHeatersState.setChecked(false);//Simulation of an actuator behaviour
+                }
+
+            }else if(isSimulating){
+                Log.i("A11","Is simulating");
+                if(tempValue<=temp_threshold){
+                    rbHeatersState.setChecked(true);//Simulation of an actuator behaviour
+                }else{
+                    rbHeatersState.setChecked(false);//Simulation of an actuator behaviour
+                }
+            }else{
+                tvReceivedTemperature.setText("-");
+            }
+
+            handler.postDelayed(this, INTERVAL);
+        }
+    };
+
+    void startRepeatingTask() {
+        runnable.run();
+    }
+    void stopRepeatingTask() {
+        handler.removeCallbacks(runnable);
     }
 
-    private void processLogic() {
 
-    }
 
-    private void handleVoidError() {
-        Toast.makeText(this, "No empty fields allowed", Toast.LENGTH_SHORT).show();
-    }
 
-    private void displayEnteredTemperatures(float minTemperature, float maxTemperature) {
-        String displayText = "Min Temperature: " + minTemperature + "\nMax Temperature: " + maxTemperature;
-        textViewTemperatureDisplay.setText(displayText);
-    }
 
-    private void saveEnteredTemperatures(float minTemperature, float maxTemperature) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat(KEY_MIN_TEMPERATURE, minTemperature);
-        editor.putFloat(KEY_MAX_TEMPERATURE, maxTemperature);
-        editor.apply();
-    }
-
-    private void saveSwitchState(boolean isChecked) {
-        // Save the switch state in SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(KEY_SWITCH_STATE, isChecked);
-        editor.apply();
-    }
 }
