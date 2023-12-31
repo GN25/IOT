@@ -5,4 +5,8 @@
         <item>&lt;</item>
         <item>&gt;</item>
     </string-array>
+    <string-array name="spinner_items_range">
+        <item>Switching on</item>
+        <item>Switching off</item>
+    </string-array>
 </resources>

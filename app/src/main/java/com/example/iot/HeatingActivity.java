@@ -33,10 +33,11 @@ public class HeatingActivity extends AppCompatActivity {
     private Slider sliderSimulation;
     private Button btApplySimulation;
     private TextView tvState;
+    private TextView tvReceivedTemperature;
+
     private EditText editTextTempLimit;
     private Button btSaveTempThreshold;
     private TextView tvActualtempThreshold;
-    private TextView tvReceivedTemperature;
     private RadioButton rbHeatersState;
 
     private float temp_threshold;
@@ -68,6 +69,7 @@ public class HeatingActivity extends AppCompatActivity {
         tvActualtempThreshold=findViewById(R.id.tvActualTemperatureThresholdValue);
         tvReceivedTemperature=findViewById(R.id.tvReceivedTemperatureValue);
         rbHeatersState=findViewById(R.id.rbHeatersState);
+        rbHeatersState.setClickable(false);
         btApplySimulation.setEnabled(false);
         sliderSimulation.setEnabled(false);
         temp_threshold= 20;

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.slider.Slider;
 
 import java.util.Calendar;
 
@@ -49,12 +51,25 @@ public class LightsActivity extends AppCompatActivity {
     private FrameLayout dropdownContainer;
 
 
+    //Simulation fragment
+    private static final String STATE_SENSING = "Sensing";
+    private static final String STATE_SIMULATING = "Simulating";
+    private static final String STATE_SWITCHING_ON = "Switching on";
+    private static final String STATE_SWITCHING_OFF = "Switching off";
+    private Slider sliderSimulation;
+    private Button btApplySimulation;
+    private TextView tvState;
+    private TextView tvReceivedLux;
+    private float luxValue;
+    private boolean isSensing;
+    private boolean isSimulating;
+
 
     int automatedLightsMode=0;//0 nada, 1 lux level , 2 time range
     //Mode1
     private Button btnSubmitLuxLevel;
     private TextView tvActualThresholdLuxLevel;
-    private TextView tvReceivedLuxValue;
+    //private TextView tvReceivedLuxValue;
     private EditText editTextNewLuxValue;
     private  int lux_threshold = 3;
 
@@ -67,6 +82,8 @@ public class LightsActivity extends AppCompatActivity {
     private int minS;
     private int hourE;
     private int minE;
+    private String rangeMode;
+    private Spinner spRangeMode;
 
 
     private Utils utils;
@@ -86,6 +103,15 @@ public class LightsActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
+        sliderSimulation=findViewById(R.id.sliderLux);
+        btApplySimulation=findViewById(R.id.btApplySimulation);
+        tvState=findViewById(R.id.tvStateValue);
+        tvReceivedLux=findViewById(R.id.tvReceivedLuxValue);
+        btApplySimulation.setEnabled(false);
+        sliderSimulation.setEnabled(false);
+        luxValue=15;
+        tvState.setText("None");
+        tvReceivedLux.setText("-");
 
         int lastStartHour = sharedPreferences.getInt(KEY_START_HOUR, -1);
         int lastStartMinute = sharedPreferences.getInt(KEY_START_MINUTE, -1);
@@ -99,6 +125,51 @@ public class LightsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        MaterialButtonToggleGroup toggleButtonLuxMode = findViewById(R.id.toggleButtonLuxAutomation);
+
+        toggleButtonLuxMode.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if (isChecked) {
+                    if (checkedId == R.id.btSensor) {
+                        tvReceivedLux.setText(utils.lux_value_received+"");
+                        tvState.setText(STATE_SENSING);
+                        btApplySimulation.setEnabled(false);
+                        sliderSimulation.setEnabled(false);
+                        isSensing=true;
+                        isSimulating=false;
+                        startRepeatingTask();
+
+                    } else if (checkedId == R.id.btSimulation) {
+                        tvReceivedLux.setText("-");
+                        tvState.setText(STATE_SIMULATING);
+                        btApplySimulation.setEnabled(true);
+                        sliderSimulation.setEnabled(true);
+                        isSensing=false;
+                        isSimulating=true;
+                        startRepeatingTask();
+                    }
+
+
+                } else {
+                    tvState.setText("None");
+                    btApplySimulation.setEnabled(false);
+                    sliderSimulation.setEnabled(false);
+                    isSensing=false;
+                    isSimulating=false;
+                    tvReceivedLux.setText("-");
+                    stopRepeatingTask();
+                }
+            }
+        });
+        btApplySimulation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                luxValue= sliderSimulation.getValue();
+                tvReceivedLux.setText(luxValue+"");
+            }
+        });
+
 
         dropdownContainer = findViewById(R.id.dropdownContainer);
 
@@ -144,12 +215,8 @@ public class LightsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     activateLamp();
-
-
                 } else {
                     desactivateLamp();
-
-
                 }
             }
         });
@@ -162,21 +229,37 @@ public class LightsActivity extends AppCompatActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if(automatedLightsMode==1){
-                checkLuxLevel();
+            if(isSensing){
+                luxValue = utils.lux_value_received;
+                tvReceivedLux.setText(luxValue+"");
+
+                checkMode();
+
+            }else if(isSimulating){
+                //Log.i("A11","Is simulating");
+                checkMode();
+            }else{
+                tvReceivedLux.setText("-");
             }
-            if(automatedLightsMode==2){
-                checkTimeRange();
-            }
+
 
             handler.postDelayed(this, INTERVAL);
         }
     };
 
+    private void checkMode() {
+        if(automatedLightsMode==1){
+            checkLuxLevel();
+        }
+        if(automatedLightsMode==2){
+            checkTimeRange();
+        }
+    }
+
     private void checkLuxLevel() {
         btnSubmitLuxLevel=findViewById(R.id.buttonSaveLuxLevel);
         tvActualThresholdLuxLevel =findViewById(R.id.tvActualThresholdValue);
-        tvReceivedLuxValue =findViewById(R.id.tvReceivedLuxValue);
+        //tvReceivedLuxValue =findViewById(R.id.tvReceivedLuxValue);
 
         editTextNewLuxValue=findViewById(R.id.editTextLuxThreshold);
         if(btnSubmitLuxLevel!=null && tvActualThresholdLuxLevel !=null && editTextNewLuxValue!=null){
@@ -190,11 +273,11 @@ public class LightsActivity extends AppCompatActivity {
                     Log.i("Lux control", "Saved: "+lux_threshold);
                 }
             });
-            tvReceivedLuxValue.setText( utils.lux_value_received+"");
-            if(utils.lux_value_received<=lux_threshold){
+            //tvReceivedLuxValue.setText( utils.lux_value_received+"");
+            if(luxValue<=lux_threshold){
                 //Prueba para valores,
                 activateLamp();
-                Log.i("Lux control", "Activated ("+utils.lux_value_received+" < "+lux_threshold);
+                Log.i("Lux control", "Activated ("+luxValue+" < "+lux_threshold);
             }else{
                 //THE IDEA IS TO PUT THE SENSOR IN AN OUTSIDE PLACE
                 //OTHERWISE IT WILL BE A LOOP:
@@ -203,7 +286,7 @@ public class LightsActivity extends AppCompatActivity {
                 //  light ->off
                 //  off -> no light
                 desactivateLamp();
-                Log.i("Lux control", "Desactivated ( NO-> "+utils.lux_value_received+" < "+lux_threshold);
+                Log.i("Lux control", "Desactivated ( NO-> "+luxValue+" < "+lux_threshold);
             }
         }
 
@@ -230,7 +313,16 @@ public class LightsActivity extends AppCompatActivity {
         timePickerEnd = findViewById(R.id.timePickerEnd);
         btnSubmitTimeRange = findViewById(R.id.btnSubmitLights);
         tvRange = findViewById(R.id.tvCurrentHourRange);
-        if (tvRange!=null && btnSubmitTimeRange !=null && timePickerStart != null && timePickerEnd != null) {
+
+        spRangeMode=findViewById(R.id.spRangeMode);
+
+        if (spRangeMode!=null && tvRange!=null && btnSubmitTimeRange !=null && timePickerStart != null && timePickerEnd != null) {
+            String mode=spRangeMode.getSelectedItem().toString();
+            if(mode.equals("Switching on")){
+                rangeMode="Switching on";
+            }else if(mode.equals("Switching off")){
+                rangeMode="Switching off";
+            }
             btnSubmitTimeRange.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -238,6 +330,9 @@ public class LightsActivity extends AppCompatActivity {
                         minS = timePickerStart.getMinute();
                         hourE = timePickerEnd.getHour();
                         minE = timePickerEnd.getMinute();
+                        Log.i("Piti", "Entra");
+
+
                         Log.e("Hora guardada",hourS+":"+minS+" - "+hourE+":"+minE);
                         tvRange.setText(hourS+":"+minS+" - "+hourE+":"+minE);
 
@@ -246,15 +341,27 @@ public class LightsActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
             int currentMinute = calendar.get(Calendar.MINUTE);
-
-            if ((currentHour > hourS || (currentHour == hourS && currentMinute >= minS))
-                    && (currentHour < hourE || (currentHour == hourE && currentMinute <= minE))) {
-                Toast.makeText(this, "Hour in range", Toast.LENGTH_SHORT).show();
-                activateLamp();
-            } else {
-                Toast.makeText(this, "Hour not in range", Toast.LENGTH_SHORT).show();
-                desactivateLamp();
+            if(rangeMode.equals(STATE_SWITCHING_ON)){
+                if ((currentHour > hourS || (currentHour == hourS && currentMinute >= minS))
+                        && (currentHour < hourE || (currentHour == hourE && currentMinute <= minE))) {
+                    Toast.makeText(this, "Hour in range", Toast.LENGTH_SHORT).show();
+                    activateLamp();
+                } else {
+                    Toast.makeText(this, "Hour not in range", Toast.LENGTH_SHORT).show();
+                    desactivateLamp();
+                }
+            }else if(rangeMode.equals(STATE_SWITCHING_OFF)){
+                if ((currentHour > hourS || (currentHour == hourS && currentMinute >= minS))
+                        && (currentHour < hourE || (currentHour == hourE && currentMinute <= minE))) {
+                    Toast.makeText(this, "Hour in range", Toast.LENGTH_SHORT).show();
+                    desactivateLamp();
+                } else {
+                    Toast.makeText(this, "Hour not in range", Toast.LENGTH_SHORT).show();
+                    activateLamp();
+                }
             }
+
+
         } else {
             Log.e("ERROR NULL P", "Fallo al cargar layout");
         }

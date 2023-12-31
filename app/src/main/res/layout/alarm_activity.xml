@@ -14,7 +14,7 @@
         android:background="#008577" />
     <!-- ToggleButtons -->
 
-    <include layout="@layout/fragment_sensor_simulation" />
+    <include layout="@layout/fragment_sensor_simulation_temperature" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

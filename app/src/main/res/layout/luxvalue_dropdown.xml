@@ -6,24 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvReceivedLuxLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lux value received: " />
-
-        <TextView
-            android:id="@+id/tvReceivedLuxValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
