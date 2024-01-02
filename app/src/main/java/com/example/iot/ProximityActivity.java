@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -27,19 +28,25 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.slider.Slider;
+
 public class ProximityActivity extends AppCompatActivity {
 
     private static final String PREF_NAME = "AlarmPrefs";
     private static final String KEY_SWITCH_STATE = "switchState";
 
+    private static final String STATE_SENSING = "Sensing";
+    private static final String STATE_SIMULATING = "Simulating";
+
     private Switch switchAlarm;
     private SharedPreferences sharedPreferences;
-    private TextView tx_prox;
+
 
     private TextView tv_proxThreshold;
     private Button bt_saveProx;
     private EditText editText_proxThreshold;
-    private int actual_proxThreshold;
+
 
 
     private boolean notified = false;
@@ -47,6 +54,15 @@ public class ProximityActivity extends AppCompatActivity {
 
     private Handler handler;
     private final int INTERVAL = 5000;
+
+    private Slider sliderSimulation;
+    private Button btApplySimulation;
+    private TextView tvState;
+    private TextView tvReceivedProximity;
+    private float prox_threshold;
+    private float proxValue;
+    private boolean isSensing;
+    private boolean isSimulating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +78,77 @@ public class ProximityActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        tvState=findViewById(R.id.tvStateValue);
+        sliderSimulation=findViewById(R.id.sliderProx);
+        btApplySimulation=findViewById(R.id.btApplySimulation);
+        tvReceivedProximity=findViewById(R.id.tvReceivedProxValue);
+
+        btApplySimulation.setEnabled(false);
+        sliderSimulation.setEnabled(false);
+        prox_threshold= 3000;
+        proxValue=2999;
+        tvState.setText("None");
+        tvReceivedProximity.setText("-");
 
         switchAlarm = findViewById(R.id.switchAlarm);
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        tx_prox = findViewById(R.id.tx_prox);
+
         tv_proxThreshold=findViewById(R.id.tv_actualThresholdValue);
         editText_proxThreshold=findViewById(R.id.editTextProximityThreshold);
         bt_saveProx=findViewById(R.id.bt_saveProximityThreshold);
-        actual_proxThreshold=3000;
+
+
+        MaterialButtonToggleGroup toggleButtonTempMode = findViewById(R.id.toggleButtonProxAutomation);
+
+        toggleButtonTempMode.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if (isChecked) {
+                    if (checkedId == R.id.btSensor) {
+                        tvReceivedProximity.setText(utils.temp_value_received+"");
+                        tvState.setText(STATE_SENSING);
+                        btApplySimulation.setEnabled(false);
+                        sliderSimulation.setEnabled(false);
+                        isSensing=true;
+                        isSimulating=false;
+                        startRepeatingTask();
+
+                    } else if (checkedId == R.id.btSimulation) {
+                        tvReceivedProximity.setText("-");
+                        tvState.setText(STATE_SIMULATING);
+                        btApplySimulation.setEnabled(true);
+                        sliderSimulation.setEnabled(true);
+                        isSensing=false;
+                        isSimulating=true;
+                        startRepeatingTask();
+                    }
+
+
+                } else {
+                    tvState.setText("None");
+                    btApplySimulation.setEnabled(false);
+                    sliderSimulation.setEnabled(false);
+                    isSensing=false;
+                    isSimulating=false;
+                    tvReceivedProximity.setText("-");
+                    stopRepeatingTask();
+                }
+            }
+        });
+        btApplySimulation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                proxValue= sliderSimulation.getValue();
+                tvReceivedProximity.setText(proxValue+"");
+            }
+        });
+
+
         bt_saveProx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String newValue=String.valueOf(editText_proxThreshold.getText());
-               actual_proxThreshold= Integer.parseInt(newValue);
+               prox_threshold= Integer.parseInt(newValue);
                tv_proxThreshold.setText(newValue);
             }
         });
@@ -103,8 +177,16 @@ public class ProximityActivity extends AppCompatActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            if(isSensing){
+               proxValue = utils.prox_value_received;
+                tvReceivedProximity.setText(proxValue+"");
+                checkProximity();
+            }else if(isSimulating){
+                checkProximity();
 
-            checkProximity();
+            }else{
+                tvReceivedProximity.setText("-");
+            }
             handler.postDelayed(this, INTERVAL);
         }
     };
@@ -116,16 +198,15 @@ public class ProximityActivity extends AppCompatActivity {
         handler.removeCallbacks(runnable);
     }
     private void checkProximity() {
-        tx_prox.setText("Proximity detected: " + utils.prox_value_received);
 
-        Float value = utils.prox_value_received;
         if (switchAlarm.isChecked()) {
-            if (value > actual_proxThreshold) {
-                if (!notified) {
-                    System.out.println("ALARMA: " + value);
+            if (proxValue > prox_threshold) {
+                Log.i("Prox control",proxValue +">"+ prox_threshold);
+                //if (!notified) {
+                    //System.out.println("ALARMA: " + proxValue);
                     handleAlarmDetected();
                     notified = true;
-                }
+                //}
 
             }
         }
