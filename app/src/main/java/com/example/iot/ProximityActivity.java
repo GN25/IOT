@@ -77,6 +77,7 @@ public class ProximityActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Proximity control");
         }
         tvState=findViewById(R.id.tvStateValue);
         sliderSimulation=findViewById(R.id.sliderProx);
@@ -241,7 +242,7 @@ public class ProximityActivity extends AppCompatActivity {
             manager.createNotificationChannel(channel);
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "mi_canal_id")
-                .setSmallIcon(R.drawable.alarm)
+                .setSmallIcon(R.drawable.alarm_icon)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);

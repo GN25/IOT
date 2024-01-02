@@ -4,6 +4,5 @@
     <string-array name="dropdown_items">
         <item>Elemento 1</item>
         <item>Elemento 2</item>
-        <!-- Agrega más elementos según sea necesario -->
     </string-array>
 </resources>

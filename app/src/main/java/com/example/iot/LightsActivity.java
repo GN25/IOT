@@ -98,6 +98,7 @@ public class LightsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         switchOnOffLights = findViewById(R.id.switchLightsOnOff);
 
 

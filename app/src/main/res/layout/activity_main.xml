@@ -10,7 +10,7 @@
         android:background="#008577"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:title="IOT"
+        android:title="SmartHome"
         android:titleTextColor="#FFFFFF">
 
         <RelativeLayout
@@ -18,18 +18,17 @@
             android:layout_height="match_parent"
             android:gravity="center">
 
-            <!-- The main title -->
             <TextView
                 android:id="@+id/toolbarTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="323dp"
+                android:layout_height="51dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginEnd="248dp"
-                android:text="IOT"
+                android:layout_marginTop="13dp"
+                android:layout_marginEnd="48dp"
+                android:text="SmartHome"
                 android:textColor="#FFFFFF"
                 android:textSize="40sp"
                 android:textStyle="bold" />
@@ -57,7 +56,26 @@
             android:layout_gravity="center"
             android:backgroundTint="#CDDADADA"
             android:scaleType="fitCenter"
-            android:src="@drawable/lights" />
+            android:src="@drawable/light_icon"
+            />
+
+        <ImageButton
+            android:id="@+id/btnProximity"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/prox_icon" />
+
+        <ImageButton
+            android:id="@+id/btnTemperature"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#CDDADADA"
+            android:scaleType="fitCenter"
+            android:src="@drawable/temp_icon" />
 
         <ImageButton
             android:id="@+id/btnAlarm"
@@ -66,24 +84,6 @@
             android:layout_gravity="center"
             android:backgroundTint="#CDDADADA"
             android:scaleType="fitCenter"
-            android:src="@drawable/alarm" />
-
-        <ImageButton
-            android:id="@+id/btnHeating"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:backgroundTint="#CDDADADA"
-            android:scaleType="fitCenter"
-            android:src="@drawable/heating" />
-
-        <ImageButton
-            android:id="@+id/btnThermometer"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:backgroundTint="#CDDADADA"
-            android:scaleType="fitCenter"
-            android:src="@drawable/thermometer" />
+            android:src="@drawable/alarm_icon" />
     </GridLayout>
 </RelativeLayout>

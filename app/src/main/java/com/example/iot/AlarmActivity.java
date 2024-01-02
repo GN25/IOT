@@ -64,6 +64,7 @@ public class AlarmActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Alarm system");
         }
 
         tvState=findViewById(R.id.tvStateValue);

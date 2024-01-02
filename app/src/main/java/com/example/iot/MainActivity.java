@@ -18,9 +18,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ImageButton btnLights = findViewById(R.id.btnLights);
+        ImageButton btnProximity = findViewById(R.id.btnProximity);
+        ImageButton btnTemperature = findViewById(R.id.btnTemperature);
         ImageButton btnAlarm = findViewById(R.id.btnAlarm);
-        ImageButton btnHeating = findViewById(R.id.btnHeating);
-        ImageButton btnThermometer = findViewById(R.id.btnThermometer);
 
         this.utils=Utils.getInstance(getApplicationContext());
 
@@ -31,14 +31,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnAlarm.setOnClickListener(new View.OnClickListener() {
+        btnProximity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, ProximityActivity.class));
             }
         });
 
-        btnHeating.setOnClickListener(new View.OnClickListener() {
+        btnTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, HeatingActivity.class));
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnThermometer.setOnClickListener(new View.OnClickListener() {
+        btnAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, AlarmActivity.class));

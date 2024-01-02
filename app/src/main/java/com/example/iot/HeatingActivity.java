@@ -59,6 +59,8 @@ public class HeatingActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Temperature control");
+
         }
 
         tvState=findViewById(R.id.tvStateValue);
