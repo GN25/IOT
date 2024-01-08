@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
-    <!-- fragment_toggle_slider.xml -->
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleButtonTempAutomation"
         android:layout_width="wrap_content"
@@ -27,7 +26,6 @@
             android:text="Simulation" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- State TextViews -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,7 +46,6 @@
             android:layout_margin="8dp"/>
     </LinearLayout>
 
-    <!-- Slider and Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +72,6 @@
     </LinearLayout>
 
 
-    <!-- Received Temperature -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

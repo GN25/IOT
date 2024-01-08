@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -41,7 +40,6 @@ public class AlarmActivity extends AppCompatActivity {
     private TextView tvReceivedTemperature;
 
     private Button btNewAlarm;
-    private float temp_threshold;
     private float tempValue;
     private boolean isSensing;
     private boolean isSimulating;
@@ -78,7 +76,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         btApplySimulation.setEnabled(false);
         sliderSimulation.setEnabled(false);
-        temp_threshold= 20;
+
         tempValue=15;
         tvState.setText("None");
         tvReceivedTemperature.setText("-");
@@ -180,7 +178,7 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void createNewAlarm(String name, String threshold, String comparer) {
-       // Log.i("Trial2", name+" - "+threshold);
+
 
         View newLayout = getLayoutInflater().inflate(R.layout.fragment_alarm, null);
         linearContainer.addView(newLayout);
@@ -255,7 +253,6 @@ public class AlarmActivity extends AppCompatActivity {
                 Log.e("Testing", "Esta fallando");
             }
 
-            //Log.i("Testing",name+" - "+tempValue+ " <=? "+value);
         }
     }
 

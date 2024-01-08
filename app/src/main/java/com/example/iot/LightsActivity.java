@@ -119,7 +119,6 @@ public class LightsActivity extends AppCompatActivity {
         int lastEndHour = sharedPreferences.getInt(KEY_END_HOUR, -1);
         int lastEndMinute = sharedPreferences.getInt(KEY_END_MINUTE, -1);
         boolean lastSwitchState = sharedPreferences.getBoolean(KEY_SWITCH_STATE, false);
-       // switchLights.setChecked(lastSwitchState);
         displaySelectedTimeRange(lastStartHour, lastStartMinute, lastEndHour, lastEndMinute);
 
         ActionBar actionBar = getSupportActionBar();
@@ -237,7 +236,6 @@ public class LightsActivity extends AppCompatActivity {
                 checkMode();
 
             }else if(isSimulating){
-                //Log.i("A11","Is simulating");
                 checkMode();
             }else{
                 tvReceivedLux.setText("-");
@@ -260,7 +258,6 @@ public class LightsActivity extends AppCompatActivity {
     private void checkLuxLevel() {
         btnSubmitLuxLevel=findViewById(R.id.buttonSaveLuxLevel);
         tvActualThresholdLuxLevel =findViewById(R.id.tvActualThresholdValue);
-        //tvReceivedLuxValue =findViewById(R.id.tvReceivedLuxValue);
 
         editTextNewLuxValue=findViewById(R.id.editTextLuxThreshold);
         if(btnSubmitLuxLevel!=null && tvActualThresholdLuxLevel !=null && editTextNewLuxValue!=null){
@@ -274,7 +271,6 @@ public class LightsActivity extends AppCompatActivity {
                     Log.i("Lux control", "Saved: "+lux_threshold);
                 }
             });
-            //tvReceivedLuxValue.setText( utils.lux_value_received+"");
             if(luxValue<=lux_threshold){
                 //Prueba para valores,
                 activateLamp();

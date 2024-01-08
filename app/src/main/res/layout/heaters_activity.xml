@@ -15,7 +15,6 @@
         android:title="Heaters control"/>
 
 
-    <!-- ToggleButtons -->
     <include layout="@layout/fragment_sensor_simulation_temperature" />
 
     <LinearLayout
@@ -46,7 +45,6 @@
 
     </LinearLayout>
 
-    <!-- Temperature Limit -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -83,7 +81,6 @@
 
     </LinearLayout>
 
-    <!-- Heaters State -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -49,7 +49,6 @@ public class HeatingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.heating_activity);
         setContentView(R.layout.heaters_activity);
 
         utils=Utils.getInstance(getApplicationContext());
@@ -150,7 +149,6 @@ public class HeatingActivity extends AppCompatActivity {
                 checkLimits();
 
             }else if(isSimulating){
-                //Log.i("A11","Is simulating");
                checkLimits();
             }else{
                 tvReceivedTemperature.setText("-");

@@ -203,11 +203,8 @@ public class ProximityActivity extends AppCompatActivity {
         if (switchAlarm.isChecked()) {
             if (proxValue > prox_threshold) {
                 Log.i("Prox control",proxValue +">"+ prox_threshold);
-                //if (!notified) {
-                    //System.out.println("ALARMA: " + proxValue);
                     handleAlarmDetected();
                     notified = true;
-                //}
 
             }
         }
